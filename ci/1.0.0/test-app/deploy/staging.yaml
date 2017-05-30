@@ -1,3 +1,0 @@
-hosts:
-  - "testapp.staging.binded.com"
-node_env: staging

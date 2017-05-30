@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+cd "$1"
+url=$(git config --get remote.origin.url)
+basename=$(basename "$url")
+# my-repo.git
+reponame=${basename%.*}
+# my-repo
+echo -n "$reponame"

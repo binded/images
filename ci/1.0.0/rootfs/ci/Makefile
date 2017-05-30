@@ -6,18 +6,19 @@ SHELL = /bin/bash
 
 ENVIRONMENT ?= staging
 AWS_ACCOUNT_ID ?= 362178051443
+REPO_PATH ?= /ci/repo
 
 KOPS_STATE_STORE ?= 's3://binded-kops-$(ENVIRONMENT)'
 CLUSTER_NAME ?= '$(ENVIRONMENT).b1nded.com'
 
-CIRCLE_PROJECT_REPONAME ?= $(shell basename "${PWD}")
+PROJECT_REPONAME ?= $(shell ./scripts/git-repo-name $(REPO_PATH))
 IMAGE_PREFIX ?=
 MUTABLE_VERSION ?= $(ENVIRONMENT)
-VERSION ?= git-$(shell git rev-parse --short HEAD)
+VERSION ?= git-$(shell cd $(REPO_PATH) && git rev-parse --short HEAD)
 PRIVATE_REGISTRY ?= ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-1.amazonaws.com
 DOCKER_BUILD_RM ?= true
 
-SHORT_NAME:= ${CIRCLE_PROJECT_REPONAME}
+SHORT_NAME:= ${PROJECT_REPONAME}
 IMAGE := ${PRIVATE_REGISTRY}/${IMAGE_PREFIX}${SHORT_NAME}:${VERSION}
 MUTABLE_IMAGE := ${PRIVATE_REGISTRY}/${IMAGE_PREFIX}${SHORT_NAME}:${MUTABLE_VERSION}
 

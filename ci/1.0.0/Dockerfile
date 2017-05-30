@@ -32,3 +32,5 @@ RUN curl -sL https://sentry.io/get-cli/ | bash
 WORKDIR /ci
 
 COPY ./rootfs /
+
+ENTRYPOINT ["/bin/bash", "-c"]
