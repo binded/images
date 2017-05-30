@@ -1,0 +1,4 @@
+{{ define "env" }}
+            - name: NODE_ENV
+              value: {{ .Values.node_env | quote }}
+{{ end }}

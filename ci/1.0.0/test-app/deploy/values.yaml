@@ -1,0 +1,6 @@
+scaling:
+  web: 1
+hosts:
+  - "testapp.prod.binded.com"
+node_env: production
+app: testapp

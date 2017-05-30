@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.app }}-ingress
+  labels:
+    app: {{ .Values.app | quote }}
+    heritage: "binded"
+  annotations:
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - secretName: {{ .Values.app }}-tls
+    hosts:
+    {{- range .Values.hosts }}
+    - {{ . | quote }}
+    {{- end }}
+  rules:
+  {{- range .Values.hosts }}
+  - host: {{ . | quote }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.app }}
+          servicePort: 80
+  {{- end }}
