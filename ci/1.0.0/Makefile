@@ -1,4 +1,4 @@
-IMAGE := "node-build"
+IMAGE := "binded-ci"
 
 build:
 	docker build --pull \
