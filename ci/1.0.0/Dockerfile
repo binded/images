@@ -33,4 +33,4 @@ WORKDIR /ci
 
 COPY ./rootfs /
 
-ENTRYPOINT ["/bin/bash", "-c"]
+ENTRYPOINT ["/ci/entrypoint.sh"]
