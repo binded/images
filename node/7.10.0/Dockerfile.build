@@ -7,8 +7,6 @@ RUN npm install -g npm@5
 # Install yarn
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 
-RUN npm run build
-
 COPY ./rootfs.build:/
 
 ENTRYPOINT ["make"]
