@@ -55,6 +55,9 @@ test-run:
 test-npm-test:
 	$(DOCKER_RUN) docker run --rm test-app:test test
 
+test-docker-compose:
+	$(DOCKER_RUN) docker-compose ps
+
 test-run-test:
 	$(DOCKER_RUN) make run-test
 

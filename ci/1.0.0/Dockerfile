@@ -1,6 +1,7 @@
 FROM ubuntu:17.10
 
 ENV DOCKER_VERSION 17.05.0-ce
+ENV DOCKER_COMPOSE_VERSION 1.13.0
 
 RUN apt-get update -y && \
   apt-get install -y \
@@ -16,7 +17,14 @@ RUN mkdir -p /tmp/docker && \
   cd /tmp/docker && \
   wget https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION}.tgz && \
   tar -xzf *.tgz && \
-  mv docker/* /usr/local/bin/
+  mv docker/* /usr/local/bin/ && \
+  rm -rf /tmp/docker
+
+# Install docker-compose
+RUN wget \
+  -O /usr/local/bin/docker-compose \
+  https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-x86_64
+RUN chmod u+x /usr/local/bin/docker-compose
 
 # Install aws cli
 RUN pip install -U pip && \
