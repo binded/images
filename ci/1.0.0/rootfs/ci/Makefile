@@ -70,7 +70,11 @@ run:
 
 .PHONY: run-interactive
 run-interactive:
-	docker run --entrypoint /bin/bash -it $(IMAGE)
+	docker run --entrypoint /bin/sh -it $(IMAGE)
+
+.PHONY: run-interactive-build
+run-interactive-build:
+	docker run --entrypoint /bin/sh -it $(BUILD_IMAGE)
 
 .PHONY: run-test
 # TODO: detect test command instead of hard coding "make test"?

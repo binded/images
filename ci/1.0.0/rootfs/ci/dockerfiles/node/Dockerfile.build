@@ -25,10 +25,10 @@ RUN test -s .cache/node_modules \
   || true
 
 ## Install app dependencies
-COPY package.json /app/
+COPY package*.json /app/
 ARG NPM_TOKEN
 # make sure to remove unused packages in node_modules (in case we use a cache)
-RUN npm prune
+# RUN npm prune
 RUN npm install
 
 # Bundle app source
