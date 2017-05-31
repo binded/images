@@ -1,4 +1,4 @@
-IMAGE := "binded-ci"
+IMAGE := "binded/ci:1.0.0"
 
 TEST_APP := $(PWD)/../../../test-app
 

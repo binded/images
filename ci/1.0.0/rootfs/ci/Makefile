@@ -17,9 +17,9 @@ ifndef NPM_TOKEN
 $(warning "(warning) NPM_TOKEN variable is not set")
 endif
 
-ENVIRONMENT ?= staging
 AWS_ACCOUNT_ID ?= 362178051443
 REPO_PATH ?= /ci/repo
+ENVIRONMENT ?= $(shell ./scripts/guess-environment $(REPO_PATH))
 
 KOPS_STATE_STORE ?= 's3://binded-kops-$(ENVIRONMENT)'
 CLUSTER_NAME ?= '$(ENVIRONMENT).b1nded.com'
@@ -48,7 +48,14 @@ else
 DEPLOY_IMAGE := $(IMAGE)
 endif
 
+all:
+	make build
+	make test
+	make push
+	make deploy
+
 info:
+	@echo "Environment:     ${ENVIRONMENT}"
 	@echo "Build tag:       ${VERSION}"
 	@echo "Immutable image: ${IMAGE}"
 	@echo "Mutable image:   ${MUTABLE_IMAGE}"
@@ -69,7 +76,12 @@ run-interactive:
 .PHONY: run-test
 # TODO: detect test command instead of hard coding "make test"?
 run-test:
-	cd $(REPO_PATH) && make test
+	docker run \
+		--rm \
+		--privileged \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		$(BUILD_IMAGE) \
+		test
 
 .PHONY: test
 test: docker-build run-test
@@ -107,7 +119,6 @@ docker-build-runtime:
 		--rm \
 		-t $(IMAGE) \
 		/ci/out
-	docker tag $(IMAGE) $(SHORT_NAME):test
 
 .PHONY: docker-push
 docker-push: auth
