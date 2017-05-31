@@ -29,8 +29,6 @@ COPY package.json /app/
 ARG NPM_TOKEN
 # make sure to remove unused packages in node_modules (in case we use a cache)
 RUN npm prune
-# https://github.com/npm/npm/issues/9863#issuecomment-255506533
-RUN mkdir -p node_modules
 RUN npm install
 
 # Bundle app source
