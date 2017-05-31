@@ -49,7 +49,7 @@ endif
 
 all:
 	make build
-	make test
+	make run-test
 	make push
 	make deploy
 
