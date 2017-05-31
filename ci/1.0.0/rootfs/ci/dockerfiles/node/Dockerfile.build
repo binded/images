@@ -1,0 +1,52 @@
+# vim:set ft=dockerfile
+FROM binded/node-build:7.10.0
+
+# Create app directory
+RUN mkdir -p /app
+WORKDIR /app
+
+# Create .npmrc (required for private registry)
+RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
+
+# Re-use npm cache to speedup installs
+
+# Usually, "npm install" only runs when package.json changes due to cached
+# layers. However, the COPY .cache command will bust the cache once more after
+# a build because the first build's cache is different. Still a small price to
+# pay to speed up npm installs with the cache.
+COPY .cache /app/.cache
+
+# Only extract if file not empty
+# TODO: npm / yarn global cache?
+RUN test -s .cache/node_modules \
+  && mv .cache/node_modules node_modules
+  && rm -rf .cache
+  && echo "Restored .cache/node_modules to /app/node_modules" \
+  || true
+
+## Install app dependencies
+COPY package.json /app/
+ARG NPM_TOKEN
+# make sure to remove unused packages in node_modules (in case we use a cache)
+RUN npm prune
+# https://github.com/npm/npm/issues/9863#issuecomment-255506533
+RUN mkdir -p node_modules
+RUN npm install
+
+# Bundle app source
+COPY . /app
+
+# Build
+RUN npm run build
+
+# If we don't remove .npmrc, npm start will fail at run time if NPM_TOKEN is
+# not set
+RUN rm .npmrc
+
+ENV PORT 5000
+
+EXPOSE $PORT
+
+ENTRYPOINT [ "npm" ]
+
+CMD [ "start" ]

@@ -1,5 +1,5 @@
-BUILD_IMAGE := "binded/node-build:7.10.0"
-RUNTIME_IMAGE := "binded/node:7.10.0"
+BUILD_IMAGE := "binded/node-build:8.0.0"
+RUNTIME_IMAGE := "binded/node:8.0.0"
 
 build-runtime:
 	docker build \

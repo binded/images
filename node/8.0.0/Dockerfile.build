@@ -1,4 +1,4 @@
-FROM node:7.10.0
+FROM node:8.0.0
 
 # Use npm v5
 # Workaround: https://github.com/npm/npm/issues/15611#issuecomment-289133810

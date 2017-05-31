@@ -29,15 +29,15 @@ IMAGE_PREFIX ?=
 MUTABLE_VERSION ?= $(ENVIRONMENT)
 VERSION ?= git-$(shell cd $(REPO_PATH) && git rev-parse --short HEAD)
 PRIVATE_REGISTRY ?= ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-1.amazonaws.com
+DEPLOY_PATH ?= ${REPO_PATH}/deploy
 
-# TODO: build and use repo/Dockerfile.build if it exists?
-BUILDER_IMAGE ?= binded/node-build:7.10.0
-# TODO: build and use repo/Dockerfile if it exists?
-RUNTIME_IMAGE ?= binded/node:7.10.0
+# default to Node.js
+BUILD_TYPE ?= node
 
 SHORT_NAME:= ${PROJECT_REPONAME}
 IMAGE := ${PRIVATE_REGISTRY}/${IMAGE_PREFIX}${SHORT_NAME}:${VERSION}
 MUTABLE_IMAGE := ${PRIVATE_REGISTRY}/${IMAGE_PREFIX}${SHORT_NAME}:${MUTABLE_VERSION}
+BUILD_IMAGE := ${SHORT_NAME}:build
 
 DOCKERFILE_RUNTIME := ${REPO_PATH}/Dockerfile
 DOCKERFILE_BUILD := ${REPO_PATH}/Dockerfile.build
@@ -75,27 +75,34 @@ run-test:
 test: docker-build run-test
 
 $(DOCKERFILE_BUILD):
-	@echo "FROM $(BUILDER_IMAGE)" > $(DOCKERFILE_BUILD)
-	@echo "COPY . /app" >> $(DOCKERFILE_BUILD)
-	@echo "RUN make build" >> $(DOCKERFILE_BUILD)
+	cp /ci/dockerfiles/${BUILD_TYPE}/Dockerfile.build $(DOCKERFILE_BUILD)
+	@[[ ! -z "${BASE_IMAGE_BUILDER}" ]] \
+		&& sed -i'' 's=^FROM .*=FROM $(BASE_IMAGE_BUILDER)=' $(DOCKERFILE_BUILD) \
+		|| true
 
 $(DOCKERFILE_RUNTIME):
-	@echo "FROM $(RUNTIME_IMAGE)" > $(DOCKERFILE_RUNTIME)
-	@echo "COPY . /app" >> $(DOCKERFILE_RUNTIME)
+	cp /ci/dockerfiles/${BUILD_TYPE}/Dockerfile $(DOCKERFILE_RUNTIME)
+	@[[ ! -z "${BASE_IMAGE_RUNTIME}" ]] \
+		&& sed -i'' 's=^FROM .*=FROM $(BASE_IMAGE_RUNTIME)=' $(DOCKERFILE_RUNTIME) \
+		|| true
 
 .PHONY: docker-build
 docker-build: $(DOCKERFILE_BUILD) $(DOCKERFILE_RUNTIME)
 	# TODO: pass all env variables to build-arg?
-	cat $(DOCKERFILE_BUILD)
+	mkdir -p $(REPO_PATH)/.cache
 	docker build \
 		--rm \
-		-t build-img \
+		-t $(BUILD_IMAGE) \
 		-f $(DOCKERFILE_BUILD) \
-		--build-arg NPM_TOKEN \
+		--build-arg NPM_TOKEN="${NPM_TOKEN}" \
 		$(REPO_PATH)
-	docker create --name build-cont build-img
-	# TODO: remove container ? clean up? more specific build image/container names to avoid conflicts
-	docker cp build-cont:/out /ci/out
+	make docker-build-runtime
+
+docker-build-runtime:
+	docker create --name extract $(BUILD_IMAGE)
+	docker cp extract:/out /ci/out 2> /dev/null || \
+		docker cp extract:/app /ci/out
+	docker rm -f extract
 	docker build \
 		--rm \
 		-t $(IMAGE) \
@@ -103,7 +110,7 @@ docker-build: $(DOCKERFILE_BUILD) $(DOCKERFILE_RUNTIME)
 	docker tag $(IMAGE) $(SHORT_NAME):test
 
 .PHONY: docker-push
-docker-push:
+docker-push: auth
 	docker push $(IMAGE)
 
 .PHONY: docker-push-mutable
@@ -113,12 +120,12 @@ docker-push-mutable:
 
 .PHONY: auth
 auth:
-	kops export --name $(CLUSTER_NAME) --state $(KOPS_STATE_STORE) kubecfg
-	@make registry-login
+	@kops export --name $(CLUSTER_NAME) --state $(KOPS_STATE_STORE) kubecfg
+	make registry-login
 
 .PHONY: registry-login
 registry-login:
-	$(shell aws ecr get-login --region us-west-1)
+	@$(shell aws ecr get-login --region us-west-1)
 
 .PHONY: deploy-registry-secret
 deploy-registry-secret:
@@ -126,18 +133,18 @@ deploy-registry-secret:
 
 # switch kubectl context based on environment
 .PHONY: deploy-context
-kubectl-context:
+kubectl-context: auth
 	kubectl config use-context $(CLUSTER_NAME)
 
 .PHONY: deploy
-deploy: deploy-registry-secret kubectl-context
+deploy: kubectl-context
 	helm init
-	helm dependency update ./deploy
-	@helm upgrade -i \
-		-f "${REPO_PATH}/deploy/${ENVIRONMENT}.yaml" \
+	helm dependency update "${DEPLOY_PATH}"
+	# TODO: generate all --set commands based on env variables
+	# --set "$(shell ./deploy/getenv "instagram.clientSecret")"
+	helm upgrade -i \
+		-f "${DEPLOY_PATH}/${ENVIRONMENT}.yaml" \
 		--set "image=${DEPLOY_IMAGE}" \
-		# TODO: generate all --set commands based on env variables
-		# --set "$(shell ./deploy/getenv "instagram.clientSecret")"
-		"$(SHORT_NAME)" "${REPO_PATH}/deploy"
+		"${SHORT_NAME}" "${DEPLOY_PATH}"
 	curl https://raw.githubusercontent.com/binded/scripts/master/deploy-notification.sh \
-		| bash -s "${DEPLOY_IMAGE}" "${ENVIRONMENT}"
+		| bash -s "${DEPLOY_IMAGE}" "${ENVIRONMENT}" || true
