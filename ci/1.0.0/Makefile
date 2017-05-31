@@ -11,6 +11,7 @@ DOCKER_RUN_BASE = docker run \
 	--env ENVIRONMENT \
 	--env SLACK_DEV_WEBHOOK_URL \
 	--env AWS_ACCESS_KEY_ID \
+	--env HELM_PROD_SOMESECRET_ID \
 	--env AWS_SECRET_ACCESS_KEY
 
 DOCKER_RUN := $(DOCKER_RUN_BASE) $(IMAGE)
@@ -56,6 +57,9 @@ test-npm-test:
 
 test-run-test:
 	$(DOCKER_RUN) make run-test
+
+test-helmset:
+	$(DOCKER_RUN) make helmset
 
 test-push:
 	$(DOCKER_RUN) make push

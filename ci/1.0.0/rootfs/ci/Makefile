@@ -151,6 +151,10 @@ deploy-registry-secret:
 kubectl-context: auth
 	kubectl config use-context $(CLUSTER_NAME)
 
+#.PHONY: helmset
+#helmset:
+#	echo $(shell ENVIRONMENT=$(ENVIRONMENT) ./scripts/helmset $(shell cat ${DEPLOY_PATH}/envvars))
+
 .PHONY: deploy
 deploy: kubectl-context
 	helm init
@@ -160,6 +164,7 @@ deploy: kubectl-context
 	helm upgrade -i \
 		-f "${DEPLOY_PATH}/${ENVIRONMENT}.yaml" \
 		--set "image=${DEPLOY_IMAGE}" \
+		$(shell ENVIRONMENT=$(ENVIRONMENT) ./scripts/helmset $(cat ${DEPLOY_PATH}/envvars)) \
 		"${SHORT_NAME}" "${DEPLOY_PATH}"
 	curl https://raw.githubusercontent.com/binded/scripts/master/deploy-notification.sh \
 		| bash -s "${DEPLOY_IMAGE}" "${ENVIRONMENT}" || true
