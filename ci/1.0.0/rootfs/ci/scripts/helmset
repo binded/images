@@ -9,6 +9,7 @@ function yamlkey_to_value() {
 yamlkeys=("$@")
 
 for yamlkey in "${yamlkeys[@]}"; do
+  # TODO: only if value is not empty?
   echo "--set \"${yamlkey}=$(yamlkey_to_value "$yamlkey")\""
 done
 

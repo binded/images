@@ -119,6 +119,8 @@ docker-build-runtime:
 	docker cp extract:/out /ci/out 2> /dev/null || \
 		docker cp extract:/app /ci/out
 	docker rm -f extract
+	# Remove .git directory to reduce image size
+	rm -rf /ci/out/.git
 	docker build \
 		--rm \
 		-t $(IMAGE) \
