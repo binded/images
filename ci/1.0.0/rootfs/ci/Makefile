@@ -111,7 +111,7 @@ docker-build: $(DOCKERFILE_BUILD) $(DOCKERFILE_RUNTIME)
 		-f $(DOCKERFILE_BUILD) \
 		--build-arg NPM_TOKEN="${NPM_TOKEN}" \
 		$(REPO_PATH)
-	docker tag $(IMAGE) $(SHORT_NAME):test
+	docker tag $(BUILD_IMAGE) $(SHORT_NAME):test
 	make docker-build-runtime
 
 docker-build-runtime:
