@@ -64,7 +64,7 @@ run:
 
 .PHONY: run-interactive
 run-interactive:
-	docker run -it $(IMAGE) bash
+	docker run --entrypoint /bin/bash -it $(IMAGE)
 
 .PHONY: run-test
 # TODO: detect test command instead of hard coding "make test"?
