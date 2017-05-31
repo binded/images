@@ -19,8 +19,8 @@ COPY .cache /app/.cache
 # Only extract if file not empty
 # TODO: npm / yarn global cache?
 RUN test -s .cache/node_modules \
-  && mv .cache/node_modules node_modules
-  && rm -rf .cache
+  && mv .cache/node_modules node_modules \
+  && rm -rf .cache \
   && echo "Restored .cache/node_modules to /app/node_modules" \
   || true
 
