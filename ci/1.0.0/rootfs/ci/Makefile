@@ -5,7 +5,7 @@
 SHELL = /bin/bash
 
 ifndef AWS_ACCESS_KEY_ID
-$(error "AWS_ACCOUNT_ID is not set")
+$(error "AWS_ACCESS_KEY_ID is not set")
 endif
 ifndef AWS_SECRET_ACCESS_KEY
 $(error "AWS_SECRET_ACCESS_KEY is not set")
