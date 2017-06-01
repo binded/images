@@ -121,6 +121,8 @@ docker-build-runtime:
 	docker rm -f extract
 	# Remove .git directory to reduce image size
 	rm -rf /ci/out/.git
+	# Was already applied when building!
+	rm -rf /ci/out/.dockerignore
 	docker build \
 		--rm \
 		-t $(IMAGE) \
