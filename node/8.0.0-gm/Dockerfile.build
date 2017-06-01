@@ -13,8 +13,8 @@ RUN echo "deb-src http://httpredir.debian.org/debian/ sid main contrib non-free"
   && cd /tmp/gm-build \
   && apt-get build-dep -y graphicsmagick \
   && apt-get -b source graphicsmagick \
-  && dpkg -i libgraphicsmagick-q16-3_1.3.25-5_amd64.deb \
-  && dpkg -i graphicsmagick_1.3.25-5_amd64.deb \
+  && dpkg -i libgraphicsmagick-q16-3_1.3.25-*_amd64.deb \
+  && dpkg -i graphicsmagick_1.3.25-*_amd64.deb \
   && rm -rf /tmp/gm-build \
   && rm -rf /var/lib/apt/lists/*
 
