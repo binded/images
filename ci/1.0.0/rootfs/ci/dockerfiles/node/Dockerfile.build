@@ -8,6 +8,8 @@ WORKDIR /app
 # Create .npmrc (required for private registry)
 RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
 
+RUN rm -rf node_modules
+
 # Re-use npm cache to speedup installs
 
 # Usually, "npm install" only runs when package.json changes due to cached
