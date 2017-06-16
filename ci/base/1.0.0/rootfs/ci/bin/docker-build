@@ -13,6 +13,7 @@ source /ci/lib/env.sh
 
 build_docker_image() {
   cd "${BUILD_DIR}"
+  echo "Building ${IMAGE}"
   docker build \
     --rm \
     -t "${IMAGE}" \

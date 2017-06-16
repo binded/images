@@ -6,5 +6,6 @@ set -o pipefail   # do not ignore exit codes when piping output
 
 BUILD_DIR=${1:-"."}
 
+# TODO: don't do anything if ${IMAGE} already in repository?
 docker-build "${BUILD_DIR}"
 docker-push "${BUILD_DIR}"

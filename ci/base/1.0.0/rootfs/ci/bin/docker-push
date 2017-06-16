@@ -11,14 +11,20 @@ BUILD_DIR=${1:-"."}
 source /ci/lib/stdlib.sh
 source /ci/lib/env.sh
 
-validate_env
-env_info
+validate_aws_env
+
+print_info() {
+  echo "IMAGE      = ${IMAGE}"
+  echo "SHORT_NAME = ${SHORT_NAME}"
+}
+
+print_info
 
 docker_auth() {
   $(aws ecr get-login --region "${AWS_ECR_REGION}")
 }
 
-docker_auth > /dev/null
+docker_auth || die "Docker auth failed"
 
 push_docker_image() {
 	docker push "${IMAGE}"

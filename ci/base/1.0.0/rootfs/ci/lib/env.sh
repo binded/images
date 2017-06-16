@@ -11,6 +11,11 @@ git_repo_name() {
   echo -n "$reponame"
 }
 
+validate_aws_env() {
+  [ -z "$AWS_ACCESS_KEY_ID" ] && die "AWS_ACCESS_KEY_ID must be set"
+  [ -z "$AWS_SECRET_ACCESS_KEY" ] && die "AWS_SECRET_ACCESS_KEY must be set"
+}
+
 validate_env() {
   [ -z "$AWS_ACCESS_KEY_ID" ] && die "AWS_ACCESS_KEY_ID must be set"
   [ -z "$AWS_SECRET_ACCESS_KEY" ] && die "AWS_SECRET_ACCESS_KEY must be set"
@@ -27,11 +32,6 @@ guess_environment() {
   "staging") echo -n "staging" ;;
   *) echo -n "staging" ;;
   esac
-}
-
-env_info() {
-  echo "IMAGE = ${IMAGE}"
-  echo "SHORT_NAME = ${SHORT_NAME}"
 }
 
 AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID:-"362178051443"}
