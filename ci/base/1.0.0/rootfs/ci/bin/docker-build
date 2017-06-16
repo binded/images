@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Builds Docker image
+
+set -o errexit    # always exit on error
+set -o pipefail   # do not ignore exit codes when piping output
+
+BUILD_DIR=${1:-"."}
+
+# Load dependencies
+source /ci/lib/stdlib.sh
+source /ci/lib/env.sh
+
+build_docker_image() {
+  cd "${BUILD_DIR}"
+  docker build \
+    --rm \
+    -t "${IMAGE}" \
+    .
+}
+
+build_docker_image

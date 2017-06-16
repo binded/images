@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Builds Docker image and pushes to registry
+
+set -o errexit    # always exit on error
+set -o pipefail   # do not ignore exit codes when piping output
+
+BUILD_DIR=${1:-"."}
+
+# Load dependencies
+source /ci/lib/stdlib.sh
+source /ci/lib/env.sh
+
+validate_env
+env_info
+
+docker_auth() {
+  $(aws ecr get-login --region "${AWS_ECR_REGION}")
+}
+
+docker_auth > /dev/null
+
+push_docker_image() {
+	docker push "${IMAGE}"
+}
+
+push_docker_image
