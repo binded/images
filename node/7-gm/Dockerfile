@@ -1,4 +1,4 @@
-FROM binded/node:7.10.0
+FROM binded/node:7
 
 RUN cat /etc/apk/repositories
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.6/main" \
