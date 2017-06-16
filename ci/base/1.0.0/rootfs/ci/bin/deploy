@@ -13,8 +13,7 @@ source /ci/lib/env.sh
 source /ci/lib/helm.sh
 source /ci/lib/slack.sh
 
-validate_env
-env_info
+validate_aws_env
 
 echo "Deploying to ${ENVIRONMENT}"
 
@@ -40,15 +39,26 @@ prepare_helm_release() {
 
 prepare_helm_release
 
+helm_set_arguments() {
+  envvars_path="./envvars"
+  [[ ! -f "${envvars_path}" ]] && return
+  helmset $(cat "${envvars_path}")
+}
+
 helm_upgrade() {
   helm upgrade -i \
     -f "${DEPLOY_PATH}/${ENVIRONMENT}.yaml" \
     --set "image=${IMAGE}" \
-    $(helmset $(cat "${DEPLOY_PATH}/envvars")) \
+    $(helm_set_arguments) \
     "${SHORT_NAME}" \
     "${DEPLOY_PATH}"
 }
 
 helm_upgrade
 
-slack_notification "${IMAGE}" "${ENVIRONMENT}" || true
+if [ "$SLACK_DEV_WEBHOOK_URL" ]; then
+  slack_notification "${IMAGE}" "${ENVIRONMENT}"
+else
+  warn "SLACK_DEV_WEBHOOK_URL is not set"
+fi
+

@@ -12,15 +12,8 @@ git_repo_name() {
 }
 
 validate_aws_env() {
-  [ -z "$AWS_ACCESS_KEY_ID" ] && die "AWS_ACCESS_KEY_ID must be set"
-  [ -z "$AWS_SECRET_ACCESS_KEY" ] && die "AWS_SECRET_ACCESS_KEY must be set"
-}
-
-validate_env() {
-  [ -z "$AWS_ACCESS_KEY_ID" ] && die "AWS_ACCESS_KEY_ID must be set"
-  [ -z "$AWS_SECRET_ACCESS_KEY" ] && die "AWS_SECRET_ACCESS_KEY must be set"
-  [ -z "$SLACK_DEV_WEBHOOK_URL" ] && warn "SLACK_DEV_WEBHOOK_URL is not set"
-  [ -z "$NPM_TOKEN" ] && info "NPM_TOKEN is not set"
+  [ "$AWS_ACCESS_KEY_ID" ] || die "AWS_ACCESS_KEY_ID must be set"
+  [ "$AWS_SECRET_ACCESS_KEY" ] || die "AWS_SECRET_ACCESS_KEY must be set"
 }
 
 guess_environment() {
