@@ -9,6 +9,7 @@ RUN apt-get update -y && \
     curl \
     wget \
     git \
+    jq \
     python-pip && \
   rm -rf /var/lib/apt/lists/*
 
@@ -40,5 +41,7 @@ RUN curl -sL https://sentry.io/get-cli/ | bash
 WORKDIR /ci
 
 COPY ./rootfs /
+
+ENV PATH /ci/bin:$PATH
 
 ENTRYPOINT ["/ci/entrypoint.sh"]

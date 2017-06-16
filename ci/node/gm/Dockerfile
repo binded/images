@@ -1,4 +1,4 @@
-FROM binded/node-build:8.0.0
+FROM binded/node-ci:base
 
 # Install Graphicsmagick from sid (package in jessie has bugs with PSD files)
 
@@ -17,4 +17,3 @@ RUN echo "deb-src http://httpredir.debian.org/debian/ sid main contrib non-free"
   && dpkg -i graphicsmagick_1.3.25-*_amd64.deb \
   && rm -rf /tmp/gm-build \
   && rm -rf /var/lib/apt/lists/*
-

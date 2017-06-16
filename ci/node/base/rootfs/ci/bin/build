@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# bin/build <build-dir>
+
+# Largely taken from https://github.com/heroku/heroku-buildpack-nodejs/blob/master/bin/compile
+
+set -o errexit    # always exit on error
+set -o pipefail   # do not ignore exit codes when piping output
+
+BUILD_DIR=${1:-"."}
+
+# Load dependencies
+source /ci/lib/load-nvm.sh
+source /ci/lib/json.sh
+source /ci/lib/dependencies.sh
+
+### Check initial state
+
+[ -e "$BUILD_DIR/node_modules" ] && PREBUILD=true || PREBUILD=false
+[ -f "$BUILD_DIR/yarn.lock" ] && YARN=true || YARN=false
+[ -f "$BUILD_DIR/package-lock.json" ] && NPM_LOCK=true || NPM_LOCK=false
+
+install_bins() {
+	local node_engine
+	local npm_engine
+	# local yarn_engine
+
+	node_engine=$(read_json "$BUILD_DIR/package.json" ".engines.node")
+	# yarn_engine=$(read_json "$BUILD_DIR/package.json" ".engines.yarn")
+	npm_engine=$(read_json "$BUILD_DIR/package.json" ".engines.npm")
+
+	echo "engines.node (package.json):  ${node_engine:-unspecified (use default)}"
+	echo "engines.npm (package.json):   ${npm_engine:-unspecified (use default)}"
+
+	# Install node and npm based on package.json's engines field
+	if [ -n "$node_engine" ]; then
+		nvm install "$node_engine"
+		nvm alias default "$node_engine"
+	else
+		echo "Using default node version: $(node --version)"
+	fi
+
+	if [ -n "$npm_engine" ]; then
+		npm install -g "npm@$npm_engine"
+	else
+		echo "Using default npm version: $(npm --version)"
+	fi
+}
+
+build_dependencies() {
+  if $YARN; then
+    yarn_node_modules "$BUILD_DIR"
+  elif $PREBUILD; then
+    echo "Prebuild detected (node_modules already exists)"
+    npm_rebuild "$BUILD_DIR"
+  else
+    npm_node_modules "$BUILD_DIR"
+  fi
+}
+
+install_bins
+build_dependencies

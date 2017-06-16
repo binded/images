@@ -1,0 +1,1 @@
+# Slim production images

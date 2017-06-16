@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: binded/node-ci:base
+    working_directory: /ci/project
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run: pwd
+      - run: ls -alh
+      - run: build
