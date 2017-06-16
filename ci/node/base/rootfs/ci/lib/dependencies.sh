@@ -71,3 +71,13 @@ npm_rebuild() {
     echo "Skipping (no package.json)"
   fi
 }
+
+install_npm() {
+  local version=${1}
+  # Workaround: https://github.com/npm/npm/issues/15611#issuecomment-289133810
+  pushd /tmp
+  npm install "npm@${version}"
+  rm -rf /usr/local/lib/node_modules
+  mv node_modules /usr/local/lib/
+  popd
+}

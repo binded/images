@@ -40,7 +40,11 @@ install_bins() {
 	fi
 
 	if [ -n "$npm_engine" ]; then
-		npm install -g "npm@$npm_engine"
+		echo "Installing npm@${npm_engine}"
+		install_npm "${npm_engine}" > /dev/null 2>&1
+	elif [[ "$NPM_LOCK" = "true" ]] && [[ -n "$node_engine" ]]; then
+		echo "package-lock.json detected, using npm@5"
+		install_npm 5 > /dev/null 2>&1
 	else
 		echo "Using default npm version: $(npm --version)"
 	fi

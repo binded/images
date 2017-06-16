@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# Deploy to kubernetes using helm
+
+set -o errexit    # always exit on error
+set -o pipefail   # do not ignore exit codes when piping output
+
+BUILD_DIR=${1:-"."}
+
+# Load dependencies
+source /ci/lib/stdlib.sh
+source /ci/lib/env.sh
+source /ci/lib/helm.sh
+source /ci/lib/slack.sh
+
+validate_env
+env_info
+
+echo "Deploying to ${ENVIRONMENT}"
+
+kubectl_auth() {
+  kops export \
+    --name "${CLUSTER_NAME}" \
+    --state "${KOPS_STATE_STORE}" \
+    kubecfg
+}
+
+kubectl_auth
+
+kubectl_context() {
+	kubectl config use-context "${CLUSTER_NAME}"
+}
+
+kubectl_context
+
+prepare_helm_release() {
+  helm init
+  helm dependency update "${DEPLOY_PATH}"
+}
+
+prepare_helm_release
+
+helm_upgrade() {
+  helm upgrade -i \
+    -f "${DEPLOY_PATH}/${ENVIRONMENT}.yaml" \
+    --set "image=${IMAGE}" \
+    $(helmset $(cat "${DEPLOY_PATH}/envvars")) \
+    "${SHORT_NAME}" \
+    "${DEPLOY_PATH}"
+}
+
+helm_upgrade
+
+slack_notification "${IMAGE}" "${ENVIRONMENT}" || true

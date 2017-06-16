@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+source /ci/lib/load-nvm.sh
 
 BUILD_DIR=${1:-}
 if yarn --version > /dev/null 2>&1; then
