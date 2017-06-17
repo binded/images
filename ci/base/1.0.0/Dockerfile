@@ -38,7 +38,7 @@ RUN curl "https://raw.githubusercontent.com/binded/scripts/master/install-cli-to
 # Install sentry CLI
 RUN curl -sL https://sentry.io/get-cli/ | bash
 
-WORKDIR /ci
+WORKDIR /ci/project
 
 COPY ./rootfs /
 
