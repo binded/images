@@ -43,5 +43,3 @@ WORKDIR /ci
 COPY ./rootfs /
 
 ENV PATH /ci/bin:$PATH
-
-ENTRYPOINT ["/ci/entrypoint.sh"]
