@@ -1,3 +1,5 @@
+BUILD_DIR=${BUILD_DIR:-"."}
+
 git_repo_name() {
   local url
   local basename
