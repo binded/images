@@ -7,4 +7,4 @@ test: build
 		"$(IMAGE)" \
 		"-c" \
 		-- \
-		nvm info
+		"source /ci/lib/load-nvm.sh; nvm info"

@@ -37,15 +37,16 @@ install_yarn() {
 }
 
 
-# install_npm() {
-#   local version=${1}
-#   # Workaround: https://github.com/npm/npm/issues/15611#issuecomment-289133810
-#   pushd /tmp
-#   npm install "npm@${version}"
-#   rm -rf /usr/local/lib/node_modules
-#   mv node_modules /usr/local/lib/
-#   popd
-# }
+# Workaround: https://github.com/npm/npm/issues/15611#issuecomment-289133810
+install_npm_workaround() {
+  local version=${1}
+  local lib_dir="${NVM_BIN}/../lib"
+  pushd /tmp > /dev/null
+  npm install --unsafe-perm --quiet "npm@${version}" > /dev/null 2>&1
+  rm -rf "${lib_dir}/node_modules"
+  mv node_modules "${lib_dir}/"
+  popd > /dev/null
+}
 
 install_npm() {
   local version="$1"
@@ -68,7 +69,8 @@ install_npm() {
       echo "npm `npm --version` already installed with node"
     else
       echo "Downloading and installing npm $version (replacing version `npm --version`)..."
-      npm install --unsafe-perm --quiet -g npm@$version 2>&1 >/dev/null
+
+      install_npm_workaround "$version"
     fi
   fi
 }
