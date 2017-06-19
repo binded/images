@@ -7,6 +7,7 @@ RUN apt-get update -y && \
   apt-get install -y \
     zip \
     curl \
+    automake \
     wget \
     git \
     jq \
