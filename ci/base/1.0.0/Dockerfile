@@ -35,6 +35,9 @@ RUN pip install -U pip && \
 RUN curl "https://raw.githubusercontent.com/binded/scripts/master/install-cli-tools.sh" \
   | bash
 
+# Init helm
+RUN helm init --client-only
+
 # Install sentry CLI
 RUN curl -sL https://sentry.io/get-cli/ | bash
 
