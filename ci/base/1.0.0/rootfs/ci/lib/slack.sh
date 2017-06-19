@@ -7,7 +7,7 @@ function slack_notification() {
 
   image=$1
   env=$2
-  [ "$3" ] && release=" ($3) " || release=" "
+  [[ "$3" ]] && release=" ($3) " || release=" "
 
   [[ "${image}" == "" ]] && die "missing <image> argument"
   [[ "${env}" == "" ]] && die "missing <environment> argument"
