@@ -11,6 +11,7 @@ BUILD_DIR=${1:-"."}
 # Load dependencies
 source /ci/lib/load-nvm.sh
 source /ci/lib/json.sh
+source /ci/lib/binaries.sh
 source /ci/lib/dependencies.sh
 
 ### Check initial state
@@ -20,48 +21,36 @@ source /ci/lib/dependencies.sh
 [ -f "$BUILD_DIR/package-lock.json" ] && NPM_LOCK=true || NPM_LOCK=false
 
 install_bins() {
-	local node_engine
-	local npm_engine
-	local yarn_engine
+  local node_engine
+  local npm_engine
+  local yarn_engine
 
-	node_engine=$(read_json "$BUILD_DIR/package.json" ".engines.node")
-	yarn_engine=$(read_json "$BUILD_DIR/package.json" ".engines.yarn")
-	npm_engine=$(read_json "$BUILD_DIR/package.json" ".engines.npm")
+  node_engine=$(read_json "$BUILD_DIR/package.json" ".engines.node")
+  yarn_engine=$(read_json "$BUILD_DIR/package.json" ".engines.yarn")
+  npm_engine=$(read_json "$BUILD_DIR/package.json" ".engines.npm")
 
-	echo "engines.node (package.json):  ${node_engine:-unspecified (use default)}"
-	echo "engines.npm (package.json):   ${npm_engine:-unspecified (use default)}"
+  echo "engines.node (package.json):  ${node_engine:-unspecified (use default)}"
+  echo "engines.npm (package.json):   ${npm_engine:-unspecified (use default)}"
 
-	# Install node and npm based on package.json's engines field
-	if [ -n "$node_engine" ]; then
-		nvm install "$node_engine"
-		nvm alias default "$node_engine"
-	else
-		echo "Using default node version: $(node --version)"
-	fi
+  # Install node and npm based on package.json's engines field
+  if [ -n "$node_engine" ]; then
+    nvm install "$node_engine"
+    nvm alias default "$node_engine"
+  else
+    echo "Using default node version: $(node --version)"
+  fi
 
-	if [ -n "$npm_engine" ]; then
-		echo "Installing npm@${npm_engine}"
-		install_npm "${npm_engine}" > /dev/null 2>&1
-	# elif [[ "$NPM_LOCK" = "true" ]] && [[ -n "$node_engine" ]]; then
-		# echo "package-lock.json detected, using npm@5"
-		# install_npm 5 > /dev/null 2>&1
-	else
-		echo "Using default npm version: $(npm --version)"
-	fi
+  if [ -n "$npm_engine" ]; then
+    echo "Installing npm@${npm_engine}"
+    install_npm "$npm_engine" $NPM_LOCK
+  else
+    echo "Using default npm version: $(npm --version)"
+  fi
 
-  # Install yarn
   if [ -n "$yarn_engine" ]; then
-		echo "Installing yarn@${yarn_engine}"
-    npm install -g "yarn@${yarn_engine}"
-  elif $YARN; then
-    # only install if not already installed
-    if which yarn > /dev/null; then
-      echo "Using default yarn version: $(yarn --version)"
-    else
-      echo "Installing yarn"
-      npm install -g yarn
-      echo "Using yarn version: $(yarn --version)"
-    fi
+    install_yarn "$yarn_engine"
+  else
+    echo "Using default yarn version: $(yarn --version)"
   fi
 }
 

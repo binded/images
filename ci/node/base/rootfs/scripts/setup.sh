@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 source /root/.nvm/nvm.sh
+source /ci/lib/stdlib.sh
+source /ci/lib/binaries.sh
 
 nvm install 7
-npm install -g yarn
+install_yarn
 
 nvm install 8
-npm install -g yarn
+install_yarn
 
 nvm alias default 8
 
