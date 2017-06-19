@@ -1,3 +1,5 @@
+source /ci/lib/stdlib.sh
+
 BUILD_DIR=${BUILD_DIR:-"."}
 
 validate_aws_env() {
