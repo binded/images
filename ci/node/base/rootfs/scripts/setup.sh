@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 source /root/.nvm/nvm.sh
+
 nvm install 7
+npm install -g yarn
+
 nvm install 8
+npm install -g yarn
+
 nvm alias default 8
 
 # Use npm v5
@@ -18,3 +23,5 @@ echo "Default node version:"
 node --version
 echo "Default npm version:"
 npm --version
+echo "Default yarn version:"
+yarn --version
