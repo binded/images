@@ -44,19 +44,22 @@ helm_set_arguments() {
   helmset $(cat "${envvars_path}")
 }
 
+HELM_CONFIG_FILE=${HELM_CONFIG_FILE:-"${ENVIRONMENT}.yaml"}
+HELM_RELEASE_NAME=${HELM_RELEASE_NAME:-"${SHORT_NAME}"}
+
 helm_upgrade() {
   helm upgrade -i \
-    -f "${DEPLOY_PATH}/${ENVIRONMENT}.yaml" \
+    -f "${DEPLOY_PATH}/${HELM_CONFIG_FILE}" \
     --set "image=${IMAGE}" \
     $(helm_set_arguments) \
-    "${SHORT_NAME}" \
+    "${HELM_RELEASE_NAME}" \
     "${DEPLOY_PATH}"
 }
 
 helm_upgrade
 
 if [ "$SLACK_DEV_WEBHOOK_URL" ]; then
-  slack_notification "${IMAGE}" "${ENVIRONMENT}"
+  slack_notification "${IMAGE}" "${ENVIRONMENT}" "${HELM_RELEASE_NAME}"
 else
   warn "SLACK_DEV_WEBHOOK_URL is not set"
 fi

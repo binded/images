@@ -7,6 +7,7 @@ function slack_notification() {
 
   image=$1
   env=$2
+  [ "$3" ] && release=" ($3) " || release=" "
 
   [[ "${image}" == "" ]] && die "missing <image> argument"
   [[ "${env}" == "" ]] && die "missing <environment> argument"
@@ -25,7 +26,7 @@ function slack_notification() {
     emojis="🚀🚀🚀"
   fi
 
-  text="${user} deployed ${image_short} to ${env} ${links} ${emojis}"
+  text="${user} deployed ${image_short}${release}to ${env} ${links} ${emojis}"
 
   curl -X POST -H 'Content-type: application/json' \
     --data "{\"text\":\"${text}\", \"unfurl_links\": true }" \
