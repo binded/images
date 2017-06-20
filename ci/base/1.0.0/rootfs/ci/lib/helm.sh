@@ -10,7 +10,7 @@ helmset() {
 
   for yamlkey in "${yamlkeys[@]}"; do
     # TODO: only if value is not empty?
-    echo "--set \"${yamlkey}=$(yamlkey_to_value "$yamlkey")\""
+    echo "--set"
+    echo "${yamlkey}=$(yamlkey_to_value "$yamlkey")"
   done
 }
-
