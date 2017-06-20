@@ -73,3 +73,11 @@ docker_tag_exists() {
     > /dev/null
 }
 
+docker_image_exists() {
+  image="$1"
+  repo_name_with_tag=$(echo "$image" | cut -d "/" -f 2)
+  repo_name=$(echo "$repo_name_with_tag" | cut -d ":" -f 1)
+  tag=$(echo "$repo_name_with_tag" | cut -d ":" -f 2)
+  docker_tag_exists "${repo_name}" "${tag}"
+}
+
