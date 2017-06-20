@@ -39,7 +39,7 @@ prepare_helm_release() {
 prepare_helm_release
 
 helm_set_arguments() {
-  envvars_path="./envvars"
+  envvars_path="${DEPLOY_PATH}/envvars"
   [[ ! -f "${envvars_path}" ]] && return
   helmset $(cat "${envvars_path}")
 }
