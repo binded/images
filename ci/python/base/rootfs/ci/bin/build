@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# bin/build <build-dir>
+
+set -o errexit    # always exit on error
+set -o pipefail   # do not ignore exit codes when piping output
+
+BUILD_DIR=${1:-"."}
+
+pip install \
+  -r "$BUILD_DIR/requirements.txt" \
+  "--src=$BUILD_DIR" \
+  --disable-pip-version-check \
+  --no-cache-dir

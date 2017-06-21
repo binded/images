@@ -1,10 +1,12 @@
 FROM ubuntu:17.10
 
+ENV DEBIAN_FRONTEND=noninteractive
 ENV DOCKER_VERSION 17.05.0-ce
 ENV DOCKER_COMPOSE_VERSION 1.13.0
 
 RUN apt-get update -y && \
   apt-get install -y \
+    build-essential \
     zip \
     curl \
     automake \
