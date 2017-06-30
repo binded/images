@@ -10,30 +10,65 @@ RUN apt-get install -y python-pip python-dev build-essential
 RUN pip install --upgrade pip
 RUN apt-get install unzip
 
-RUN apt-get -y purge firefox
-RUN apt-get -y install firefox=45.0.2+build1-0ubuntu1
-RUN apt-mark hold firefox
+#=========
+# Firefox
+#=========
+ARG FIREFOX_VERSION=54.0
+RUN apt-get update -qqy \
+  && apt-get -qqy --no-install-recommends install firefox \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/* \
+  && wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2 \
+  && apt-get -y purge firefox \
+  && rm -rf /opt/firefox \
+  && tar -C /opt -xjf /tmp/firefox.tar.bz2 \
+  && rm /tmp/firefox.tar.bz2 \
+  && mv /opt/firefox /opt/firefox-$FIREFOX_VERSION \
+  && ln -fs /opt/firefox-$FIREFOX_VERSION/firefox /usr/bin/firefox
 
-RUN apt-get -y install libxss1 libappindicator1 libindicator7
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#============
+# GeckoDriver
+#============
+ARG GECKODRIVER_VERSION=0.17.0
+RUN wget --no-verbose -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v$GECKODRIVER_VERSION/geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz \
+  && rm -rf /opt/geckodriver \
+  && tar -C /opt -zxf /tmp/geckodriver.tar.gz \
+  && rm /tmp/geckodriver.tar.gz \
+  && mv /opt/geckodriver /opt/geckodriver-$GECKODRIVER_VERSION \
+  && chmod 755 /opt/geckodriver-$GECKODRIVER_VERSION \
+  && ln -fs /opt/geckodriver-$GECKODRIVER_VERSION /usr/bin/geckodriver
 
-RUN apt-get -y install xvfb
+#============================================
+# Google Chrome
+#============================================
+# can specify versions by CHROME_VERSION;
+#  e.g. google-chrome-stable=53.0.2785.101-1
+#       google-chrome-beta=53.0.2785.92-1
+#       google-chrome-unstable=54.0.2840.14-1
+#       latest (equivalent to google-chrome-stable)
+#       google-chrome-beta  (pull latest beta)
+#============================================
+ARG CHROME_VERSION="google-chrome-stable"
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+  && apt-get update -qqy \
+  && apt-get -qqy install \
+    ${CHROME_VERSION:-google-chrome-stable} \
+  && rm /etc/apt/sources.list.d/google-chrome.list \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-RUN apt-get -y install gconf-service libgconf-2-4 libnspr4 libnss3 xdg-utils fonts-liberation
+USER seluser
 
-RUN dpkg -i google-chrome*.deb
-RUN apt-get install -f
-
-
-RUN apt-get -y install unzip
-
-RUN wget -N http://chromedriver.storage.googleapis.com/2.26/chromedriver_linux64.zip
-RUN unzip chromedriver_linux64.zip
-RUN chmod +x chromedriver
-
-RUN mv -f chromedriver /usr/local/share/chromedriver
-RUN ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
-RUN ln -s /usr/local/share/chromedriver /usr/bin/chromedriver
+#==================
+# Chrome webdriver
+#==================
+ARG CHROME_DRIVER_VERSION=2.30
+RUN wget --no-verbose -O /tmp/chromedriver_linux64.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip \
+  && rm -rf /opt/selenium/chromedriver \
+  && unzip /tmp/chromedriver_linux64.zip -d /opt/selenium \
+  && rm /tmp/chromedriver_linux64.zip \
+  && mv /opt/selenium/chromedriver /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
+  && chmod 755 /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
+  && sudo ln -fs /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver
 
 
 ENV LANG C.UTF-8
