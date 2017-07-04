@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM python:3.6.1
 MAINTAINER Binded (info@binded.com)
 
 RUN su
@@ -9,16 +9,17 @@ RUN apt-get install -y wget
 RUN apt-get install -y python-pip python-dev build-essential
 RUN pip install --upgrade pip
 RUN apt-get install unzip
+RUN apt-get install -y xvfb
 
 #=========
 # Firefox
 #=========
 ARG FIREFOX_VERSION=54.0
 RUN apt-get update -qqy \
-  && apt-get -qqy --no-install-recommends install firefox \
+  && apt-get -qqy --no-install-recommends install iceweasel \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/* \
   && wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2 \
-  && apt-get -y purge firefox \
+  && apt-get -y purge iceweasel \
   && rm -rf /opt/firefox \
   && tar -C /opt -xjf /tmp/firefox.tar.bz2 \
   && rm /tmp/firefox.tar.bz2 \
@@ -56,8 +57,6 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
   && rm /etc/apt/sources.list.d/google-chrome.list \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-USER seluser
-
 #==================
 # Chrome webdriver
 #==================
@@ -68,8 +67,7 @@ RUN wget --no-verbose -O /tmp/chromedriver_linux64.zip https://chromedriver.stor
   && rm /tmp/chromedriver_linux64.zip \
   && mv /opt/selenium/chromedriver /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
   && chmod 755 /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
-  && sudo ln -fs /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver
-
+  && ln -fs /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
