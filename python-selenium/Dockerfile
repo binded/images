@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM python:3.6.1
 MAINTAINER Binded (info@binded.com)
 
 RUN su
