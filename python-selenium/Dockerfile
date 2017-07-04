@@ -9,6 +9,7 @@ RUN apt-get install -y wget
 RUN apt-get install -y python-pip python-dev build-essential
 RUN pip install --upgrade pip
 RUN apt-get install unzip
+RUN apt-get install -y xvfb
 
 #=========
 # Firefox
@@ -67,7 +68,6 @@ RUN wget --no-verbose -O /tmp/chromedriver_linux64.zip https://chromedriver.stor
   && mv /opt/selenium/chromedriver /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
   && chmod 755 /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
   && ln -fs /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver
-
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
