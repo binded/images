@@ -31,9 +31,8 @@ RUN pip3 install numpy
 ENV OPENCV_VERSION="3.2.0"
 RUN mkdir -p /opt/opencv
 WORKDIR /opt/opencv
-RUN git clone https://github.com/Itseez/opencv_contrib.git
-RUN cd opencv_contrib && git checkout "${OPENCV_VERSION}"
-RUN git clone https://github.com/Itseez/opencv.git
+RUN git clone --depth 1 https://github.com/Itseez/opencv_contrib.git -b "${OPENCV_VERSION}"
+RUN git clone --depth 1 https://github.com/Itseez/opencv.git -b "${OPENCV_VERSION}"
 RUN cd opencv && git checkout "${OPENCV_VERSION}"
 RUN cd opencv && \
   mkdir build && \
@@ -60,9 +59,8 @@ WORKDIR /opt
 #ENV FAISS_BRANCH=master
 #RUN git clone https://github.com/facebookresearch/faiss.git && \
 #  git checkout "${FAISS_BRANCH}"
-RUN git clone https://github.com/olalonde/faiss.git && \
-  cd faiss && \
-  git checkout python-cflags
+ENV FAISS_BRANCH=python-cflags
+RUN git clone --depth 1 https://github.com/olalonde/faiss.git -b "${FAISS_BRANCH}"
 ENV BLASLDFLAGS="/usr/lib/libopenblas.so.0"
 ENV PYTHONCFLAGS="-I/usr/include/python3.5m/ -I/usr/local/lib/python3.5/dist-packages/numpy/core/include"
 RUN cd faiss && \
